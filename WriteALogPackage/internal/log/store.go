@@ -7,14 +7,6 @@ import (
 	"sync"
 )
 
-/*
-Record - the data stored in our log.
-Store - the file we store records in.
-Index - the file we store index entries in.
-Segment - the abstraction that ties a store and an index together.
-Log - the abstraction that ties all the segments together.
- */
-
 var (
 	enc = binary.BigEndian
 )
@@ -23,13 +15,22 @@ const (
 	lenWidth = 8
 )
 
+/*
+Record - the data stored in our log.
+Store - the file we store records in.
+Index - the file we store index entries in.
+Segment - the abstraction that ties a store and an index together.
+Log - the abstraction that ties all the segments together.
+*/
+
 type store struct {
 	*os.File
 	mu   sync.Mutex
 	buf  *bufio.Writer
 	size uint64
 }
-func newStore(f *os.File) (*store, error){
+
+func newStore(f *os.File) (*store, error) {
 	fi, err := os.Stat(f.Name())
 	if err != nil {
 		return nil, err
@@ -38,9 +39,10 @@ func newStore(f *os.File) (*store, error){
 	return &store{
 		File: f,
 		size: size,
-		buf: bufio.NewWriter(f),
+		buf:  bufio.NewWriter(f),
 	}, nil
 }
+
 func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -56,6 +58,7 @@ func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	s.size += uint64(w)
 	return uint64(w), pos, nil
 }
+
 func (s *store) Read(pos uint64) ([]byte, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -66,19 +69,27 @@ func (s *store) Read(pos uint64) ([]byte, error) {
 	if _, err := s.File.ReadAt(size, int64(pos)); err != nil {
 		return nil, err
 	}
-	b := make([]byte, enc.Uint16(size))
+	b := make([]byte, enc.Uint64(size))
 	if _, err := s.File.ReadAt(b, int64(pos+lenWidth)); err != nil {
 		return nil, err
 	}
 	return b, nil
 }
+
+func (s *store) ReadAt(p []byte, off int64) (int, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	if err := s.buf.Flush(); err != nil {
+		return 0, err
+	}
+	return s.File.ReadAt(p, off)
+}
+
 func (s *store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	err := s.buf.Flush()
-	if err != nil {
+	if err := s.buf.Flush(); err != nil {
 		return err
 	}
 	return s.File.Close()
 }
-
