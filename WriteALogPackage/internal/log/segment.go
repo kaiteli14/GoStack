@@ -1,4 +1,4 @@
-// START: intro
+// Package log START: intro
 package log
 
 import (
@@ -58,7 +58,7 @@ func newSegment(dir string, baseOffset uint64, c Config) (*segment, error) {
 
 // END: newsegment
 
-// START: append
+// Append START: append
 func (s *segment) Append(record *api.Record) (offset uint64, err error) {
 	cur := s.nextOffset
 	record.Offset = cur
@@ -84,7 +84,20 @@ func (s *segment) Append(record *api.Record) (offset uint64, err error) {
 // END: append
 
 // START: read
-func (s *segment) Read(off uint64) (*api.Record, error) {
+//func (s *segment) Read(off uint64) (*api.Record, error) {
+//	_, pos, err := s.index.Read(int64(off - s.baseOffset))
+//	if err != nil {
+//		return nil, err
+//	}
+//	p, err := s.store.Read(pos)
+//	if err != nil {
+//		return nil, err
+//	}
+//	record := &api.Record{}
+//	err = proto.Unmarshal(p, record)
+//	return record, err
+//}
+func (s *segment) Read(off uint64) (*api.Record, error){
 	_, pos, err := s.index.Read(int64(off - s.baseOffset))
 	if err != nil {
 		return nil, err
@@ -98,9 +111,10 @@ func (s *segment) Read(off uint64) (*api.Record, error) {
 	return record, err
 }
 
+
 // END: read
 
-// START: ismaxed
+// IsMaxed START: ismaxed
 func (s *segment) IsMaxed() bool {
 	return s.store.size >= s.config.Segment.MaxStoreBytes ||
 		s.index.size >= s.config.Segment.MaxIndexBytes
@@ -108,7 +122,7 @@ func (s *segment) IsMaxed() bool {
 
 // END: ismaxed
 
-// START: close
+// Close START: close
 func (s *segment) Close() error {
 	if err := s.index.Close(); err != nil {
 		return err
@@ -121,7 +135,7 @@ func (s *segment) Close() error {
 
 // END: close
 
-// START: remove
+// Remove START: remove
 func (s *segment) Remove() error {
 	if err := s.Close(); err != nil {
 		return err
