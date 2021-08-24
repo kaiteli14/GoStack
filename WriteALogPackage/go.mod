@@ -1,15 +1,11 @@
-module github.com/stretchr/testify/require
+module github.com/travisjeffery/proglog
 
-go 1.17
-
-require (
-	github.com/stretchr/testify v1.7.0
-	github.com/tysontate/gommap v0.0.0-20210506040252-ef38c88b18e1
-)
+go 1.13
 
 require (
-	github.com/davecgh/go-spew v1.1.0 // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
+	github.com/golang/protobuf v1.4.1
+	github.com/stretchr/testify v1.4.0
+	github.com/tysontate/gommap v0.0.0-20190103205956-899e1273fb5c
+	google.golang.org/protobuf v1.25.0
 	launchpad.net/gocheck v0.0.0-20140225173054-000000000087 // indirect
 )
