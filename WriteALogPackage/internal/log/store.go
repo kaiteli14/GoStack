@@ -1,3 +1,4 @@
+// START: intro
 package log
 
 import (
@@ -14,14 +15,6 @@ var (
 const (
 	lenWidth = 8
 )
-
-/*
-Record - the data stored in our log.
-Store - the file we store records in.
-Index - the file we store index entries in.
-Segment - the abstraction that ties a store and an index together.
-Log - the abstraction that ties all the segments together.
-*/
 
 type store struct {
 	*os.File
@@ -43,6 +36,9 @@ func newStore(f *os.File) (*store, error) {
 	}, nil
 }
 
+// END: intro
+
+// START: append
 func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -59,6 +55,9 @@ func (s *store) Append(p []byte) (n uint64, pos uint64, err error) {
 	return uint64(w), pos, nil
 }
 
+// END: append
+
+// START: readat
 func (s *store) Read(pos uint64) ([]byte, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -76,6 +75,9 @@ func (s *store) Read(pos uint64) ([]byte, error) {
 	return b, nil
 }
 
+// END: readat
+
+// START: rawreadat
 func (s *store) ReadAt(p []byte, off int64) (int, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -84,12 +86,16 @@ func (s *store) ReadAt(p []byte, off int64) (int, error) {
 	}
 	return s.File.ReadAt(p, off)
 }
+// END: rawreadat
 
+// START: close
 func (s *store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if err := s.buf.Flush(); err != nil {
+	err := s.buf.Flush()
+	if err != nil {
 		return err
 	}
 	return s.File.Close()
 }
+// END: close

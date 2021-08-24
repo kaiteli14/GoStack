@@ -1,9 +1,11 @@
+// START: begin
 package log
 
 import (
-	"github.com/tysontate/gommap"
 	"io"
 	"os"
+
+	"github.com/tysontate/gommap"
 )
 
 var (
@@ -18,6 +20,9 @@ type index struct {
 	size uint64
 }
 
+// END: begin
+
+// START: newindex
 func newIndex(f *os.File, c Config) (*index, error) {
 	idx := &index{
 		file: f,
@@ -42,6 +47,9 @@ func newIndex(f *os.File, c Config) (*index, error) {
 	return idx, nil
 }
 
+// END: newindex
+
+// START: close
 func (i *index) Close() error {
 	if err := i.mmap.Sync(gommap.MS_SYNC); err != nil {
 		return err
@@ -55,7 +63,10 @@ func (i *index) Close() error {
 	return i.file.Close()
 }
 
-func(i *index) Read(in int64) (out uint32, pos uint64, err error) {
+// END: close
+
+// START: read
+func (i *index) Read(in int64) (out uint32, pos uint64, err error) {
 	if i.size == 0 {
 		return 0, 0, io.EOF
 	}
@@ -65,22 +76,31 @@ func(i *index) Read(in int64) (out uint32, pos uint64, err error) {
 		out = uint32(in)
 	}
 	pos = uint64(out) * entWidth
-	if i.size < pos + entWidth {
+	if i.size < pos+entWidth {
 		return 0, 0, io.EOF
 	}
 	out = enc.Uint32(i.mmap[pos : pos+offWidth])
-	pos = enc.Uint64(i.mmap[pos + offWidth : pos + entWidth])
+	pos = enc.Uint64(i.mmap[pos+offWidth : pos+entWidth])
 	return out, pos, nil
 }
+
+// END: read
+
+// START: write
 func (i *index) Write(off uint32, pos uint64) error {
 	if uint64(len(i.mmap)) < i.size+entWidth {
 		return io.EOF
 	}
 	enc.PutUint32(i.mmap[i.size:i.size+offWidth], off)
 	enc.PutUint64(i.mmap[i.size+offWidth:i.size+entWidth], pos)
-	i.size += entWidth
+	i.size += uint64(entWidth)
 	return nil
 }
+
+// END: write
+
+// START: name
 func (i *index) Name() string {
 	return i.file.Name()
 }
+// END: name
