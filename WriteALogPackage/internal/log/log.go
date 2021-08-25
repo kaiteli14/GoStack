@@ -1,4 +1,4 @@
-// START: begin
+// Package log START: begin
 package log
 
 import (
@@ -27,7 +27,7 @@ type Log struct {
 
 // END: begin
 
-// START: newlog
+// NewLog START: newlog
 func NewLog(dir string, c Config) (*Log, error) {
 	if c.Segment.MaxStoreBytes == 0 {
 		c.Segment.MaxStoreBytes = 1024
