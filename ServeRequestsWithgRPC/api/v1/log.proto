@@ -21,7 +21,7 @@ message ConsumeRequest {
   uint64 offset = 1;
 }
 message ConsumeResponse {
-  uint64 record = 2;
+  Record record = 2;
 }
 
 message Record {
