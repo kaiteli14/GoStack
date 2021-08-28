@@ -2,7 +2,7 @@ syntax="proto3";
 
 package log.v1;
 
-option go_package = "github.com/travisjeffery/api/log_v1";
+option go_package = "api/v1";
 
 service Log {
   rpc Produce(ProduceRequest) returns (ProduceResponse){}
@@ -22,4 +22,9 @@ message ConsumeRequest {
 }
 message ConsumeResponse {
   uint64 record = 2;
+}
+
+message Record {
+  bytes value = 1;
+  uint64 offset = 2;
 }
