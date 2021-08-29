@@ -1,7 +1,7 @@
 package server
 
 import (
-	"ServeRequestsWithgRPC/internal/log"
+	"SecureYourServices/internal/log"
 	"context"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -10,8 +10,9 @@ import (
 	"net"
 	"testing"
 
-	api "ServeRequestsWithgRPC/api/v1"
+	api "SecureYourServices/api/v1"
 )
+
 
 func TestServer(t *testing.T) {
 	for scenario, fn := range map[string]func(
